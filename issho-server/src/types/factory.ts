@@ -1,4 +1,4 @@
-import type { Room, Message } from './Objects';
+import type { Room, Message } from './objects';
 
 export function createRoom(roomname: string): Room {
     return {
