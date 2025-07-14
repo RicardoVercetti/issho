@@ -1,51 +1,17 @@
-import { useState } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { useChat } from './hooks/useChat';
-import { LoginPage } from './pages/LoginPage';
-import { ChatPage } from './pages/ChatPage';
-
-function App() {
-  const [serverUrl] = useState('ws://localhost:8080'); // Update with your server URL
-  const {
-    messages,
-    currentRoom,
-    isConnected,
-    connect,
-    joinRoom,
-    sendMessage,
-    disconnect,
-  } = useChat(serverUrl);
-
-  const handleConnect = async (username: string) => {
-    const connected = await connect(username);
-    if (connected) {
-      // For demo, join a default room. In real app, you'd have room selection
-      joinRoom('default', username);
-    }
-    return connected;
-  };
-
+export default function App() {
   return (
-    <Router>
-      <Routes>
-        <Route
-          path="/"
-          element={<LoginPage onConnect={handleConnect} />}
-        />
-        <Route
-          path="/chat"
-          element={
-            <ChatPage
-              messages={messages}
-              currentRoom={currentRoom}
-              onSendMessage={sendMessage}
-              onDisconnect={disconnect}
-            />
-          }
-        />
-      </Routes>
-    </Router>
-  );
+    <div className="p-8">
+      <h1 className="text-3xl font-bold text-blue-600 mb-4">
+        Tailwind Test
+      </h1>
+      <div className="p-4 bg-green-100 border border-green-400 rounded">
+        <p className="text-green-800">
+          If you see colored boxes, Tailwind is working!
+        </p>
+        <button className="mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
+          Test Button
+        </button>
+      </div>
+    </div>
+  )
 }
-
-export default App;
