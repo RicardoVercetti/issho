@@ -1,10 +1,9 @@
-export function HomePage({ username }: { username: string }) {
-  const handleSignOut = () => {
-    // Remove the username from localStorage
-    localStorage.removeItem('issho-username');
-    // Refresh the page to trigger the welcome screen
-    window.location.reload();
-  };
+interface HomePageProps {
+  username: string;
+  onSignOut: () => void;  // Changed from handleSignOut to onSignOut
+}
+
+export function HomePage({ username, onSignOut }: HomePageProps) {
 
   return (
     <div className="min-h-screen bg-gray-100 p-4">
@@ -17,7 +16,7 @@ export function HomePage({ username }: { username: string }) {
               <span className="font-semibold">{username}</span>
             </div>
             <button
-              onClick={handleSignOut}
+              onClick={onSignOut}
               className="px-3 py-1 text-sm text-red-600 border border-red-300 rounded-md hover:bg-red-50 transition duration-200"
             >
               Sign Out

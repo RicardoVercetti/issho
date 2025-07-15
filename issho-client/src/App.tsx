@@ -1,28 +1,16 @@
-import { useState, useEffect } from 'react';
+// import { useState, useEffect } from 'react';
 import { WelcomeScreen } from './screens/WelcomeScreen';
 import { HomePage } from './screens/HomeScreen';
+import useUsername from './hooks/useUsername';
 
 export default function App() {
-  const [username, setUsername] = useState<string | null>(null);
-
-  useEffect(() => {
-    // Check if username exists in localStorage when component mounts
-    const savedUsername = localStorage.getItem('issho-username');
-    if (savedUsername) {
-      setUsername(savedUsername);
-    }
-  }, []);
-
-  const handleUsernameSubmit = (name: string) => {
-    localStorage.setItem('issho-username', name);
-    setUsername(name);
-  };
+  const { username, saveUsername, clearUsername } = useUsername();
 
   if (!username) {
-    return <WelcomeScreen onUsernameSubmit={handleUsernameSubmit} />;
+    return <WelcomeScreen onUsernameSubmit={saveUsername} />;
   }
 
-  return <HomePage username={username} />;
+  return <HomePage username={username} onSignOut={clearUsername} />;
 }
 
 
