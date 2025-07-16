@@ -1,4 +1,3 @@
-// import { useState, useEffect } from 'react';
 import { WelcomeScreen } from './screens/WelcomeScreen';
 import { HomePage } from './screens/HomeScreen';
 import useUsername from './hooks/useUsername';
