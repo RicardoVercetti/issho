@@ -1,10 +1,12 @@
 import express, { Request, Response } from "express";
 import { all_rooms } from "./data/store";
 import { createMessage, createRoom } from "./types/factory";
+import cors from 'cors';
 
 const app = express();
 const port = 4000;
 
+app.use(cors);
 app.use(express.json());    // parse json body
 
 // REST endpoints
