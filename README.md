@@ -6,7 +6,7 @@ A simple Chat server similar to teams made for quick texting and file sharing li
 > 💡 **Note**: All the messages sent, rooms created & files shated are in-memory and disappears when you restart the server.
 
 ## 🤔 Why was this built?
-- **Reason 1:** To understand the JS ideology of *'It might not be the best, but it works'* way of building solutions.
+- **Reason 1:** To understand the JS ideology of *'It might not be the most efficient solution, but it works'* way of building solutions.
 - **Reason 2:** Rarely, a short(1-2hrs) Ethernet/wifi issue makes local file sharing and simple texting hard at my office. Wanted to solve that problem with this experimental application.
 
 ## 🎯 Milestones
