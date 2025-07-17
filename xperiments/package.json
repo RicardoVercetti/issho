@@ -1,0 +1,20 @@
+{
+  "name": "xperiments",
+  "version": "1.0.0",
+  "description": "Just testing stuff",
+  "main": "index.js",
+  "scripts": {
+    "dev": "ts-node-dev index.ts",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^24.0.14",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.8.3"
+  },
+  "dependencies": {
+    "net": "^1.0.2"
+  }
+}

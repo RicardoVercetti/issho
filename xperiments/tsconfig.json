@@ -1,0 +1,10 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",  // or "ESNext" if using ES modules
+    "moduleResolution": "node",  // or "NodeNext" for newer setups
+    "baseUrl": "./",
+    "paths": {
+      "*": ["*"]
+    }
+  }
+}
