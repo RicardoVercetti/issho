@@ -1,7 +1,7 @@
 export type Message = {
     username: string,
     message: string,
-    time: Date
+    time: string
 }
 
 export type Room = {

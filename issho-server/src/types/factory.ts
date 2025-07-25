@@ -11,6 +11,6 @@ export function createMessage(name: string, message: string): Message {
     return {
         username: name,
         message: message,
-        time: new Date()
+        time: new Date().toISOString()
     }
 }
