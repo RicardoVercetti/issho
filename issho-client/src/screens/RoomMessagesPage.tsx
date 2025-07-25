@@ -1,6 +1,6 @@
 // screens/RoomMessagesPage.tsx
 import { useParams } from "react-router-dom";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import useUsername from "../hooks/useUsername";
 
 interface Message {
@@ -21,7 +21,7 @@ export function RoomMessagesPage() {
 
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
-  const fetchMessages = () => {
+  const fetchMessages = useCallback(() => {
     fetch(`http://localhost:4000/allMessage/${roomName}`)
       .then((res) => {
         if (!res.ok) throw new Error("Failed to fetch messages");
@@ -35,13 +35,13 @@ export function RoomMessagesPage() {
         setError(err.message || "Something went wrong");
         setLoading(false);
       });
-  };
+  }, [roomName]);
 
   useEffect(() => {
     fetchMessages(); // initial load
     const interval = setInterval(fetchMessages, 3000); // auto-refresh every 3s
     return () => clearInterval(interval);
-  }, [roomName]);
+  }, [fetchMessages]);
 
   useEffect(() => {
     if (messagesEndRef.current) {
