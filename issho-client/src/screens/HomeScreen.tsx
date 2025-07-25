@@ -1,5 +1,5 @@
 // screens/HomeScreen.tsx
-import { AppLayout } from '../components/AppLayout';
+import { AppLayout } from "../components/AppLayout";
 
 interface HomePageProps {
   username: string;

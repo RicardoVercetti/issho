@@ -1,20 +1,20 @@
 // screens/RoomsPage.tsx
-import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 
 export function RoomsPage() {
   const [rooms, setRooms] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [newRoomName, setNewRoomName] = useState('');
+  const [newRoomName, setNewRoomName] = useState("");
   const [addingRoom, setAddingRoom] = useState(false);
   const [addError, setAddError] = useState<string | null>(null);
 
   const fetchRooms = () => {
     setLoading(true);
-    fetch('http://localhost:4000/all_rooms')
+    fetch("http://localhost:4000/all_rooms")
       .then((res) => {
-        if (!res.ok) throw new Error('Failed to fetch rooms');
+        if (!res.ok) throw new Error("Failed to fetch rooms");
         return res.json();
       })
       .then((data) => {
@@ -22,7 +22,7 @@ export function RoomsPage() {
         setLoading(false);
       })
       .catch((err) => {
-        setError(err.message || 'Something went wrong');
+        setError(err.message || "Something went wrong");
         setLoading(false);
       });
   };
@@ -36,25 +36,27 @@ export function RoomsPage() {
     setAddingRoom(true);
     setAddError(null);
 
-    fetch('http://localhost:4000/room', {
-      method: 'POST',
+    fetch("http://localhost:4000/room", {
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({ room_name: newRoomName.trim() }),
     })
       .then((res) => {
         if (!res.ok) {
-          return res.json().then(err => { throw new Error(err.error || 'Failed to create room') });
+          return res.json().then((err) => {
+            throw new Error(err.error || "Failed to create room");
+          });
         }
         return res.json();
       })
       .then(() => {
-        setNewRoomName('');
+        setNewRoomName("");
         fetchRooms(); // Refresh list
       })
       .catch((err) => {
-        setAddError(err.message || 'Something went wrong');
+        setAddError(err.message || "Something went wrong");
       })
       .finally(() => {
         setAddingRoom(false);
@@ -80,7 +82,7 @@ export function RoomsPage() {
             disabled={addingRoom}
             className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition"
           >
-            {addingRoom ? 'Adding...' : 'Add Room'}
+            {addingRoom ? "Adding..." : "Add Room"}
           </button>
         </div>
         {addError && <p className="text-red-500 mt-2">{addError}</p>}

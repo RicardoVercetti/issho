@@ -1,7 +1,11 @@
-import { useState } from 'react';
+import { useState } from "react";
 
-export function WelcomeScreen({ onUsernameSubmit }: { onUsernameSubmit: (name: string) => void }) {
-  const [inputName, setInputName] = useState('');
+export function WelcomeScreen({
+  onUsernameSubmit,
+}: {
+  onUsernameSubmit: (name: string) => void;
+}) {
+  const [inputName, setInputName] = useState("");
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -13,7 +17,9 @@ export function WelcomeScreen({ onUsernameSubmit }: { onUsernameSubmit: (name: s
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
       <div className="p-8 bg-white rounded-lg shadow-md w-full max-w-md">
-        <h1 className="text-3xl font-bold text-center text-blue-600 mb-6">Welcome to Issho</h1>
+        <h1 className="text-3xl font-bold text-center text-blue-600 mb-6">
+          Welcome to Issho
+        </h1>
         <p className="text-gray-600 mb-6 text-center">
           Enter your username to start chatting
         </p>

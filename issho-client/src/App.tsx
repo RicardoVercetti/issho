@@ -1,12 +1,17 @@
 // App.tsx
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { WelcomeScreen } from './screens/WelcomeScreen';
-import { ChatPage } from './screens/ChatPage';
-import { SettingsPage } from './screens/Settings';
-import { RoomsPage } from './screens/Rooms';
-import { RoomMessagesPage } from './screens/RoomMessagesPage';
-import { AppLayout } from './components/AppLayout';
-import useUsername from './hooks/useUsername';
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
+import { WelcomeScreen } from "./screens/WelcomeScreen";
+import { ChatPage } from "./screens/ChatPage";
+import { SettingsPage } from "./screens/Settings";
+import { RoomsPage } from "./screens/Rooms";
+import { RoomMessagesPage } from "./screens/RoomMessagesPage";
+import { AppLayout } from "./components/AppLayout";
+import useUsername from "./hooks/useUsername";
 
 export default function App() {
   const { username, saveUsername, clearUsername } = useUsername();
@@ -15,7 +20,10 @@ export default function App() {
     return (
       <Router>
         <Routes>
-          <Route path="*" element={<WelcomeScreen onUsernameSubmit={saveUsername} />} />
+          <Route
+            path="*"
+            element={<WelcomeScreen onUsernameSubmit={saveUsername} />}
+          />
         </Routes>
       </Router>
     );
@@ -25,7 +33,9 @@ export default function App() {
     <Router>
       <Routes>
         {/* AppLayout wraps all routes that need the sidebar */}
-        <Route element={<AppLayout username={username} onSignOut={clearUsername} />}>
+        <Route
+          element={<AppLayout username={username} onSignOut={clearUsername} />}
+        >
           <Route path="/" element={<ChatPage />} />
           <Route path="/rooms" element={<RoomsPage />} />
           <Route path="/settings" element={<SettingsPage />} />

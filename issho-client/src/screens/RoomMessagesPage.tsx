@@ -1,7 +1,7 @@
 // screens/RoomMessagesPage.tsx
-import { useParams } from 'react-router-dom';
-import { useEffect, useRef, useState } from 'react';
-import useUsername from '../hooks/useUsername';
+import { useParams } from "react-router-dom";
+import { useEffect, useRef, useState } from "react";
+import useUsername from "../hooks/useUsername";
 
 interface Message {
   username: string;
@@ -16,7 +16,7 @@ export function RoomMessagesPage() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [newMessage, setNewMessage] = useState('');
+  const [newMessage, setNewMessage] = useState("");
   const [sending, setSending] = useState(false);
 
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
@@ -24,7 +24,7 @@ export function RoomMessagesPage() {
   const fetchMessages = () => {
     fetch(`http://localhost:4000/allMessage/${roomName}`)
       .then((res) => {
-        if (!res.ok) throw new Error('Failed to fetch messages');
+        if (!res.ok) throw new Error("Failed to fetch messages");
         return res.json();
       })
       .then((data) => {
@@ -32,7 +32,7 @@ export function RoomMessagesPage() {
         setLoading(false);
       })
       .catch((err) => {
-        setError(err.message || 'Something went wrong');
+        setError(err.message || "Something went wrong");
         setLoading(false);
       });
   };
@@ -45,7 +45,7 @@ export function RoomMessagesPage() {
 
   useEffect(() => {
     if (messagesEndRef.current) {
-      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+      messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
     }
   }, [messages]);
 
@@ -53,9 +53,9 @@ export function RoomMessagesPage() {
     if (!newMessage.trim()) return;
 
     setSending(true);
-    fetch('http://localhost:4000/message', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+    fetch("http://localhost:4000/message", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         room_name: roomName,
         username,
@@ -63,11 +63,14 @@ export function RoomMessagesPage() {
       }),
     })
       .then((res) => {
-        if (!res.ok) return res.json().then(err => { throw new Error(err.message) });
+        if (!res.ok)
+          return res.json().then((err) => {
+            throw new Error(err.message);
+          });
         return res.json();
       })
       .then(() => {
-        setNewMessage('');
+        setNewMessage("");
         fetchMessages(); // update immediately after send
       })
       .catch((err) => {
@@ -79,9 +82,9 @@ export function RoomMessagesPage() {
   };
 
   const formatTime = (iso?: string) => {
-    if (!iso) return '';
+    if (!iso) return "";
     const date = new Date(iso);
-    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
   };
 
   return (
@@ -104,7 +107,9 @@ export function RoomMessagesPage() {
             <div key={index} className="bg-white p-3 rounded shadow-sm">
               <div className="flex justify-between items-center mb-1">
                 <strong className="text-blue-600">{msg.username}</strong>
-                <span className="text-sm text-gray-400">{formatTime(msg.time)}</span>
+                <span className="text-sm text-gray-400">
+                  {formatTime(msg.time)}
+                </span>
               </div>
               <p className="text-gray-700">{msg.message}</p>
             </div>
@@ -122,7 +127,7 @@ export function RoomMessagesPage() {
           value={newMessage}
           onChange={(e) => setNewMessage(e.target.value)}
           onKeyDown={(e) => {
-            if (e.key === 'Enter') handleSendMessage();
+            if (e.key === "Enter") handleSendMessage();
           }}
         />
         <button
@@ -130,7 +135,7 @@ export function RoomMessagesPage() {
           onClick={handleSendMessage}
           disabled={sending}
         >
-          {sending ? 'Sending...' : 'Send'}
+          {sending ? "Sending..." : "Send"}
         </button>
       </div>
     </div>
