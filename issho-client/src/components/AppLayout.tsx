@@ -1,21 +1,17 @@
 // components/AppLayout.tsx
-import type { ReactNode } from 'react';
+import { Outlet, Link, useLocation } from 'react-router-dom';
 
 interface AppLayoutProps {
-  children: ReactNode;
   username: string;
   onSignOut: () => void;
-  currentPage: string;
-  onNavigate: (page: string) => void;
 }
 
-export function AppLayout({
-  children,
-  username,
-  onSignOut,
-  currentPage,
-  onNavigate,
-}: AppLayoutProps) {
+export function AppLayout({ username, onSignOut }: AppLayoutProps) {
+  const location = useLocation();
+  const currentPath = location.pathname;
+
+  const isActive = (path: string) => currentPath === path;
+
   return (
     <div className="flex min-h-screen bg-gray-100">
       <aside className="w-64 bg-white p-6 shadow-md">
@@ -25,17 +21,30 @@ export function AppLayout({
           <p className="font-semibold">{username}</p>
         </div>
         <nav className="space-y-4">
-          {['home', 'rooms', 'settings'].map((page) => (
-            <button
-              key={page}
-              onClick={() => onNavigate(page)}
-              className={`block w-full text-left px-4 py-2 rounded-md ${
-                currentPage === page ? 'bg-blue-500 text-white' : 'hover:bg-blue-100'
-              }`}
-            >
-              {page.charAt(0).toUpperCase() + page.slice(1)}
-            </button>
-          ))}
+          <Link
+            to="/"
+            className={`block w-full text-left px-4 py-2 rounded-md ${
+              isActive('/') ? 'bg-blue-500 text-white' : 'hover:bg-blue-100'
+            }`}
+          >
+            Home
+          </Link>
+          <Link
+            to="/rooms"
+            className={`block w-full text-left px-4 py-2 rounded-md ${
+              isActive('/rooms') ? 'bg-blue-500 text-white' : 'hover:bg-blue-100'
+            }`}
+          >
+            Rooms
+          </Link>
+          <Link
+            to="/settings"
+            className={`block w-full text-left px-4 py-2 rounded-md ${
+              isActive('/settings') ? 'bg-blue-500 text-white' : 'hover:bg-blue-100'
+            }`}
+          >
+            Settings
+          </Link>
         </nav>
         <button
           onClick={onSignOut}
@@ -45,7 +54,9 @@ export function AppLayout({
         </button>
       </aside>
 
-      <main className="flex-1 p-6">{children}</main>
+      <main className="flex-1 p-6">
+        <Outlet />
+      </main>
     </div>
   );
 }
