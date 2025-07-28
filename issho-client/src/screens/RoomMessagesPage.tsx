@@ -3,11 +3,26 @@ import { useParams } from "react-router-dom";
 import { useEffect, useRef, useState, useCallback } from "react";
 import useUsername from "../hooks/useUsername";
 
-interface Message {
+interface BaseMessage {
   username: string;
-  message: string;
   time?: string;
+  type: "text" | "file";
 }
+
+interface TextMessage extends BaseMessage {
+  type: "text";
+  message: string;
+}
+
+interface FileMessage extends BaseMessage {
+  type: "file";
+  filename: string;
+  originalName: string;
+  size: number;
+  mimetype: string;
+}
+
+type Message = TextMessage | FileMessage;
 
 export function RoomMessagesPage() {
   const { roomName } = useParams();
@@ -111,7 +126,23 @@ export function RoomMessagesPage() {
                   {formatTime(msg.time)}
                 </span>
               </div>
-              <p className="text-gray-700">{msg.message}</p>
+              {msg.type === "text" && (
+                <p className="text-gray-700">{msg.message}</p>
+              )}
+              {msg.type === "file" && (
+                <div className="text-gray-700">
+                  📎{" "}
+                  <a
+                    href={`http://localhost:4000/uploads/${msg.filename}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-600 underline"
+                  >
+                    {msg.originalName}
+                  </a>{" "}
+                  ({(msg.size / 1024).toFixed(1)} KB)
+                </div>
+              )}
             </div>
           ))}
           <div ref={messagesEndRef} />
