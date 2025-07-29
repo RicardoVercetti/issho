@@ -96,6 +96,36 @@ export function RoomMessagesPage() {
       });
   };
 
+  const handleFileUpload = (file: File) => {
+    if (!roomName || !username) {
+      alert("Room name or username missing");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("username", username);
+
+    fetch(`http://localhost:4000/upload/${roomName}`, {
+      method: "POST",
+      body: formData,
+    })
+      .then((res) => {
+        if (!res.ok) {
+          return res.json().then((err) => {
+            throw new Error(err.error || "Upload failed");
+          });
+        }
+        return res.json();
+      })
+      .then(() => {
+        fetchMessages(); // Refresh messages
+      })
+      .catch((err) => {
+        alert(`File upload error: ${err.message}`);
+      });
+  };
+
   const formatTime = (iso?: string) => {
     if (!iso) return "";
     const date = new Date(iso);
@@ -150,7 +180,7 @@ export function RoomMessagesPage() {
       </div>
 
       {/* Send message section */}
-      <div className="border-t p-3 flex gap-2 bg-white">
+      <div className="border-t p-3 flex gap-2 bg-white items-center">
         <input
           type="text"
           className="flex-1 px-4 py-2 border border-gray-300 rounded-md"
@@ -161,6 +191,23 @@ export function RoomMessagesPage() {
             if (e.key === "Enter") handleSendMessage();
           }}
         />
+        <input
+          type="file"
+          id="file-upload"
+          className="hidden"
+          onChange={(e) => {
+            if (e.target.files && e.target.files[0]) {
+              handleFileUpload(e.target.files[0]);
+              e.target.value = ""; // Reset file input after selection
+            }
+          }}
+        />
+        <label
+          htmlFor="file-upload"
+          className="bg-gray-200 text-gray-700 px-3 py-2 rounded-md cursor-pointer hover:bg-gray-300 transition"
+        >
+          📎
+        </label>
         <button
           className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition"
           onClick={handleSendMessage}
