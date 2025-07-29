@@ -34,14 +34,12 @@ app.get("/", (req: Request, res: Response) => {
 
 // get all rooms
 app.get("/all_rooms", (req: Request, res: Response) => {
-  // return an array of all room names
   res.json(all_rooms.map((room) => room.name));
 });
 
 // create room
 all_rooms.push(createRoom("General")); // default room
 app.post("/room", (req: Request, res: Response) => {
-  // console.log("Create new room request received");
   const { room_name } = req.body;
   if (!room_name) {
     return res
@@ -49,13 +47,11 @@ app.post("/room", (req: Request, res: Response) => {
       .json({ error: "room_name is required to create a room" });
   }
 
-  // same room name shouldn't exist already
   if (all_rooms.some((room) => room.name === room_name)) {
     console.log("Room name already exists: ", room_name);
     return res.status(409).json({ error: "Room name already exists" });
   }
 
-  // now create the room
   all_rooms.push(createRoom(room_name));
   res.json({ message: "Room created successfully" });
 });
@@ -79,7 +75,6 @@ app.post("/message", (req: Request, res: Response) => {
     return res.status(400).json({ message: "Message cannot be empty" });
   }
 
-  // room exists and the message is addable
   all_rooms
     .find((r) => r.name === room_name)
     ?.messages.push(createTextMessage(username, message));
