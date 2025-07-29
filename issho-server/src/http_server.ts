@@ -39,7 +39,7 @@ app.get("/all_rooms", (req: Request, res: Response) => {
 });
 
 // create room
-all_rooms.push(createRoom("gaming")); // default room
+all_rooms.push(createRoom("General")); // default room
 app.post("/room", (req: Request, res: Response) => {
   // console.log("Create new room request received");
   const { room_name } = req.body;
