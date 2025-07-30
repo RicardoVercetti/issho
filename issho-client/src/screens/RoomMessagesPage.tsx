@@ -33,6 +33,7 @@ export function RoomMessagesPage() {
   const [error, setError] = useState<string | null>(null);
   const [newMessage, setNewMessage] = useState("");
   const [sending, setSending] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
 
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
@@ -132,15 +133,58 @@ export function RoomMessagesPage() {
     return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
   };
 
+  // Drag-and-drop handlers
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+
+    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      const file = e.dataTransfer.files[0];
+      handleFileUpload(file);
+      e.dataTransfer.clearData();
+    }
+  };
+
   return (
-    <div className="flex flex-col h-full max-h-screen">
+    <div className="flex flex-col h-full max-h-screen relative">
       {/* Top bar */}
       <div className="bg-green-600 text-white px-6 py-3 text-xl font-semibold shadow-md">
         Room: {roomName}
       </div>
 
+      {/* Drag Overlay */}
+      {isDragging && (
+        <div className="absolute inset-0 bg-green-100 bg-opacity-75 z-10 flex justify-center items-center pointer-events-none">
+          <p className="text-green-700 text-xl font-semibold">
+            Drop file to upload 📎
+          </p>
+        </div>
+      )}
+
       {/* Message list */}
-      <div className="flex-1 overflow-y-auto px-4 py-3 bg-gray-50">
+      <div
+        className={`flex-1 overflow-y-auto px-4 py-3 transition-all duration-200 ${
+          isDragging
+            ? "bg-green-50 border-2 border-dashed border-green-400"
+            : "bg-gray-50"
+        }`}
+        onDragOver={handleDragOver}
+        onDragLeave={handleDragLeave}
+        onDrop={handleDrop}
+      >
         {loading && <p className="text-gray-500">Loading messages...</p>}
         {error && <p className="text-red-500">Error: {error}</p>}
         {!loading && messages.length === 0 && (
