@@ -1,16 +1,35 @@
-import type { Room, Message } from './objects';
+import type { Room, TextMessage, FileMessage } from "./objects";
 
 export function createRoom(roomname: string): Room {
-    return {
-        name: roomname,
-        messages: []
-    }
+  return {
+    name: roomname,
+    messages: [],
+  };
 }
 
-export function createMessage(name: string, message: string): Message {
-    return {
-        username: name,
-        message: message,
-        time: new Date().toISOString()
-    }
+export function createTextMessage(
+  username: string,
+  message: string
+): TextMessage {
+  return {
+    type: "text",
+    username,
+    message,
+    time: new Date().toISOString(),
+  };
+}
+
+export function createFileMessage(
+  username: string,
+  file: Express.Multer.File
+): FileMessage {
+  return {
+    type: "file",
+    username,
+    filename: file.filename,
+    originalName: file.originalname,
+    size: file.size,
+    mimetype: file.mimetype,
+    time: new Date().toISOString(),
+  };
 }

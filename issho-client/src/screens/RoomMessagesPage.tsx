@@ -3,10 +3,30 @@ import { useParams } from "react-router-dom";
 import { useEffect, useRef, useState, useCallback } from "react";
 import useUsername from "../hooks/useUsername";
 
-interface Message {
+interface BaseMessage {
   username: string;
-  message: string;
   time?: string;
+  type: "text" | "file";
+}
+
+interface TextMessage extends BaseMessage {
+  type: "text";
+  message: string;
+}
+
+interface FileMessage extends BaseMessage {
+  type: "file";
+  filename: string;
+  originalName: string;
+  size: number;
+  mimetype: string;
+}
+
+type Message = TextMessage | FileMessage;
+
+interface UploadProgress {
+  file: File;
+  progress: number;
 }
 
 export function RoomMessagesPage() {
@@ -18,6 +38,10 @@ export function RoomMessagesPage() {
   const [error, setError] = useState<string | null>(null);
   const [newMessage, setNewMessage] = useState("");
   const [sending, setSending] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
+  const [uploadProgressList, setUploadProgressList] = useState<
+    UploadProgress[]
+  >([]);
 
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
@@ -81,6 +105,73 @@ export function RoomMessagesPage() {
       });
   };
 
+  const handleFileUpload = (file: File) => {
+    if (!roomName || !username) {
+      alert("Room name or username missing");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("username", username);
+
+    const xhr = new XMLHttpRequest();
+    xhr.open("POST", `http://localhost:4000/upload/${roomName}`, true);
+
+    xhr.upload.onprogress = (event) => {
+      if (event.lengthComputable) {
+        const progress = Math.round((event.loaded / event.total) * 100);
+        setUploadProgressList((prev) =>
+          prev.map((item) =>
+            item.file === file ? { ...item, progress } : item
+          )
+        );
+      }
+    };
+
+    xhr.onload = () => {
+      setUploadProgressList((prev) =>
+        prev.filter((item) => item.file !== file)
+      );
+      if (xhr.status >= 200 && xhr.status < 300) {
+        fetchMessages();
+      } else {
+        alert(`Upload failed: ${xhr.responseText}`);
+      }
+    };
+
+    xhr.onerror = () => {
+      alert("Upload failed due to a network error.");
+    };
+
+    setUploadProgressList((prev) => [...prev, { file, progress: 0 }]);
+    xhr.send(formData);
+  };
+
+  const handleMultipleFileUpload = (files: FileList | null) => {
+    if (!files) return;
+    Array.from(files).forEach(handleFileUpload);
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      handleMultipleFileUpload(e.dataTransfer.files);
+      e.dataTransfer.clearData();
+    }
+  };
+
   const formatTime = (iso?: string) => {
     if (!iso) return "";
     const date = new Date(iso);
@@ -88,14 +179,32 @@ export function RoomMessagesPage() {
   };
 
   return (
-    <div className="flex flex-col h-full max-h-screen">
+    <div className="flex flex-col h-full max-h-screen relative">
       {/* Top bar */}
       <div className="bg-green-600 text-white px-6 py-3 text-xl font-semibold shadow-md">
         Room: {roomName}
       </div>
 
+      {/* Drag Overlay */}
+      {isDragging && (
+        <div className="absolute inset-0 bg-green-100 bg-opacity-75 z-10 flex justify-center items-center pointer-events-none">
+          <p className="text-green-700 text-xl font-semibold">
+            Drop file(s) to upload 📎
+          </p>
+        </div>
+      )}
+
       {/* Message list */}
-      <div className="flex-1 overflow-y-auto px-4 py-3 bg-gray-50">
+      <div
+        className={`flex-1 overflow-y-auto px-4 py-3 transition-all duration-200 ${
+          isDragging
+            ? "bg-green-50 border-2 border-dashed border-green-400"
+            : "bg-gray-50"
+        }`}
+        onDragOver={handleDragOver}
+        onDragLeave={handleDragLeave}
+        onDrop={handleDrop}
+      >
         {loading && <p className="text-gray-500">Loading messages...</p>}
         {error && <p className="text-red-500">Error: {error}</p>}
         {!loading && messages.length === 0 && (
@@ -111,15 +220,47 @@ export function RoomMessagesPage() {
                   {formatTime(msg.time)}
                 </span>
               </div>
-              <p className="text-gray-700">{msg.message}</p>
+              {msg.type === "text" && (
+                <p className="text-gray-700">{msg.message}</p>
+              )}
+              {msg.type === "file" && (
+                <div className="text-gray-700">
+                  📎{" "}
+                  <a
+                    href={`http://localhost:4000/uploads/${msg.filename}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-600 underline"
+                  >
+                    {msg.originalName}
+                  </a>{" "}
+                  ({(msg.size / 1024).toFixed(1)} KB)
+                </div>
+              )}
             </div>
           ))}
+
+          {/* Upload progress */}
+          {uploadProgressList.map((item, i) => (
+            <div key={i} className="bg-white p-2 rounded shadow-sm border">
+              <div className="text-sm text-gray-600 truncate">
+                {item.file.name}
+              </div>
+              <div className="w-full bg-gray-200 h-2 rounded mt-1">
+                <div
+                  className="bg-green-500 h-2 rounded"
+                  style={{ width: `${item.progress}%` }}
+                ></div>
+              </div>
+            </div>
+          ))}
+
           <div ref={messagesEndRef} />
         </div>
       </div>
 
       {/* Send message section */}
-      <div className="border-t p-3 flex gap-2 bg-white">
+      <div className="border-t p-3 flex gap-2 bg-white items-center">
         <input
           type="text"
           className="flex-1 px-4 py-2 border border-gray-300 rounded-md"
@@ -130,6 +271,22 @@ export function RoomMessagesPage() {
             if (e.key === "Enter") handleSendMessage();
           }}
         />
+        <input
+          type="file"
+          id="file-upload"
+          multiple
+          className="hidden"
+          onChange={(e) => {
+            handleMultipleFileUpload(e.target.files);
+            e.target.value = "";
+          }}
+        />
+        <label
+          htmlFor="file-upload"
+          className="bg-gray-200 text-gray-700 px-3 py-2 rounded-md cursor-pointer hover:bg-gray-300 transition"
+        >
+          📎
+        </label>
         <button
           className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition"
           onClick={handleSendMessage}
