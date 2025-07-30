@@ -24,6 +24,11 @@ interface FileMessage extends BaseMessage {
 
 type Message = TextMessage | FileMessage;
 
+interface UploadProgress {
+  file: File;
+  progress: number;
+}
+
 export function RoomMessagesPage() {
   const { roomName } = useParams();
   const { username } = useUsername();
@@ -34,6 +39,9 @@ export function RoomMessagesPage() {
   const [newMessage, setNewMessage] = useState("");
   const [sending, setSending] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
+  const [uploadProgressList, setUploadProgressList] = useState<
+    UploadProgress[]
+  >([]);
 
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
@@ -107,55 +115,67 @@ export function RoomMessagesPage() {
     formData.append("file", file);
     formData.append("username", username);
 
-    fetch(`http://localhost:4000/upload/${roomName}`, {
-      method: "POST",
-      body: formData,
-    })
-      .then((res) => {
-        if (!res.ok) {
-          return res.json().then((err) => {
-            throw new Error(err.error || "Upload failed");
-          });
-        }
-        return res.json();
-      })
-      .then(() => {
-        fetchMessages(); // Refresh messages
-      })
-      .catch((err) => {
-        alert(`File upload error: ${err.message}`);
-      });
+    const xhr = new XMLHttpRequest();
+    xhr.open("POST", `http://localhost:4000/upload/${roomName}`, true);
+
+    xhr.upload.onprogress = (event) => {
+      if (event.lengthComputable) {
+        const progress = Math.round((event.loaded / event.total) * 100);
+        setUploadProgressList((prev) =>
+          prev.map((item) =>
+            item.file === file ? { ...item, progress } : item
+          )
+        );
+      }
+    };
+
+    xhr.onload = () => {
+      setUploadProgressList((prev) =>
+        prev.filter((item) => item.file !== file)
+      );
+      if (xhr.status >= 200 && xhr.status < 300) {
+        fetchMessages();
+      } else {
+        alert(`Upload failed: ${xhr.responseText}`);
+      }
+    };
+
+    xhr.onerror = () => {
+      alert("Upload failed due to a network error.");
+    };
+
+    setUploadProgressList((prev) => [...prev, { file, progress: 0 }]);
+    xhr.send(formData);
+  };
+
+  const handleMultipleFileUpload = (files: FileList | null) => {
+    if (!files) return;
+    Array.from(files).forEach(handleFileUpload);
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      handleMultipleFileUpload(e.dataTransfer.files);
+      e.dataTransfer.clearData();
+    }
   };
 
   const formatTime = (iso?: string) => {
     if (!iso) return "";
     const date = new Date(iso);
     return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-  };
-
-  // Drag-and-drop handlers
-  const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setIsDragging(true);
-  };
-
-  const handleDragLeave = (e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setIsDragging(false);
-  };
-
-  const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setIsDragging(false);
-
-    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-      const file = e.dataTransfer.files[0];
-      handleFileUpload(file);
-      e.dataTransfer.clearData();
-    }
   };
 
   return (
@@ -169,7 +189,7 @@ export function RoomMessagesPage() {
       {isDragging && (
         <div className="absolute inset-0 bg-green-100 bg-opacity-75 z-10 flex justify-center items-center pointer-events-none">
           <p className="text-green-700 text-xl font-semibold">
-            Drop file to upload 📎
+            Drop file(s) to upload 📎
           </p>
         </div>
       )}
@@ -219,6 +239,22 @@ export function RoomMessagesPage() {
               )}
             </div>
           ))}
+
+          {/* Upload progress */}
+          {uploadProgressList.map((item, i) => (
+            <div key={i} className="bg-white p-2 rounded shadow-sm border">
+              <div className="text-sm text-gray-600 truncate">
+                {item.file.name}
+              </div>
+              <div className="w-full bg-gray-200 h-2 rounded mt-1">
+                <div
+                  className="bg-green-500 h-2 rounded"
+                  style={{ width: `${item.progress}%` }}
+                ></div>
+              </div>
+            </div>
+          ))}
+
           <div ref={messagesEndRef} />
         </div>
       </div>
@@ -238,12 +274,11 @@ export function RoomMessagesPage() {
         <input
           type="file"
           id="file-upload"
+          multiple
           className="hidden"
           onChange={(e) => {
-            if (e.target.files && e.target.files[0]) {
-              handleFileUpload(e.target.files[0]);
-              e.target.value = ""; // Reset file input after selection
-            }
+            handleMultipleFileUpload(e.target.files);
+            e.target.value = "";
           }}
         />
         <label
