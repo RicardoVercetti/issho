@@ -17,8 +17,14 @@ export function RoomsPage() {
         if (!res.ok) throw new Error("Failed to fetch rooms");
         return res.json();
       })
-      .then((data) => {
-        setRooms(data);
+      .then((newRooms) => {
+        // Only update if rooms actually changed
+        setRooms((prevRooms) => {
+          if (JSON.stringify(prevRooms) === JSON.stringify(newRooms)) {
+            return prevRooms;
+          }
+          return newRooms;
+        });
         setLoading(false);
         setError(null);
       })
@@ -91,13 +97,15 @@ export function RoomsPage() {
         {addError && <p className="text-red-500 mt-2">{addError}</p>}
       </div>
 
-      {loading && <p className="text-gray-500">Loading rooms...</p>}
+      {loading && rooms.length === 0 && (
+        <p className="text-gray-500">Loading rooms...</p>
+      )}
       {error && <p className="text-red-500">Error: {error}</p>}
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {rooms.map((room) => (
           <Link to={`/room/${room}`} key={room}>
-            <div className="border border-gray-300 rounded-md p-4 bg-white shadow hover:shadow-md transition cursor-pointer">
+            <div className="border border-gray-300 rounded-md p-4 bg-white shadow hover:shadow-md transition-all duration-300 ease-in-out transform hover:-translate-y-1">
               <h3 className="text-lg font-semibold text-gray-700">{room}</h3>
             </div>
           </Link>
