@@ -20,6 +20,7 @@ export function RoomsPage() {
       .then((data) => {
         setRooms(data);
         setLoading(false);
+        setError(null);
       })
       .catch((err) => {
         setError(err.message || "Something went wrong");
@@ -29,6 +30,8 @@ export function RoomsPage() {
 
   useEffect(() => {
     fetchRooms();
+    const intervalId = setInterval(fetchRooms, 3000); // 3000ms = 3 seconds
+    return () => clearInterval(intervalId);
   }, []);
 
   const handleAddRoom = () => {
