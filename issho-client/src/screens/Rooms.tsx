@@ -1,6 +1,7 @@
 // screens/RoomsPage.tsx
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { API_BASE_URL } from "../config/config";
 
 export function RoomsPage() {
   const [rooms, setRooms] = useState<string[]>([]);
@@ -12,7 +13,7 @@ export function RoomsPage() {
 
   const fetchRooms = () => {
     setLoading(true);
-    fetch("http://localhost:4000/all_rooms")
+    fetch(`${API_BASE_URL}/all_rooms`)
       .then((res) => {
         if (!res.ok) throw new Error("Failed to fetch rooms");
         return res.json();
@@ -36,7 +37,7 @@ export function RoomsPage() {
     setAddingRoom(true);
     setAddError(null);
 
-    fetch("http://localhost:4000/room", {
+    fetch(`${API_BASE_URL}/room`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

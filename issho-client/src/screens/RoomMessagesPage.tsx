@@ -2,6 +2,7 @@
 import { useParams } from "react-router-dom";
 import { useEffect, useRef, useState, useCallback } from "react";
 import useUsername from "../hooks/useUsername";
+import { API_BASE_URL } from "../config/config";
 
 interface BaseMessage {
   username: string;
@@ -46,7 +47,7 @@ export function RoomMessagesPage() {
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
   const fetchMessages = useCallback(() => {
-    fetch(`http://localhost:4000/allMessage/${roomName}`)
+    fetch(`${API_BASE_URL}/allMessage/${roomName}`)
       .then((res) => {
         if (!res.ok) throw new Error("Failed to fetch messages");
         return res.json();
@@ -77,7 +78,7 @@ export function RoomMessagesPage() {
     if (!newMessage.trim()) return;
 
     setSending(true);
-    fetch("http://localhost:4000/message", {
+    fetch(`${API_BASE_URL}/message`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -116,7 +117,7 @@ export function RoomMessagesPage() {
     formData.append("username", username);
 
     const xhr = new XMLHttpRequest();
-    xhr.open("POST", `http://localhost:4000/upload/${roomName}`, true);
+    xhr.open("POST", `${API_BASE_URL}/upload/${roomName}`, true);
 
     xhr.upload.onprogress = (event) => {
       if (event.lengthComputable) {
@@ -227,7 +228,7 @@ export function RoomMessagesPage() {
                 <div className="text-gray-700">
                   📎{" "}
                   <a
-                    href={`http://localhost:4000/uploads/${msg.filename}`}
+                    href={`${API_BASE_URL}/uploads/${msg.filename}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-blue-600 underline"
