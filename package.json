@@ -1,0 +1,24 @@
+{
+  "name": "issho",
+  "version": "1.0.0",
+  "description": "Issho the simple chat app",
+  "main": "index.js",
+  "scripts": {
+    "start": "concurrently -n server,client -c blue,green \"npm run start --prefix issho-server\" \"npm run start --prefix issho-client\"",
+    "dev": "concurrently \"npm run dev --prefix issho-server\" \"npm run dev --prefix issho-client\"",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/RicardoVercetti/issho.git"
+  },
+  "author": "RicardoVercet",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/RicardoVercetti/issho/issues"
+  },
+  "homepage": "https://github.com/RicardoVercetti/issho#readme",
+  "devDependencies": {
+    "concurrently": "^9.0.0"
+  }
+}
