@@ -57,7 +57,23 @@ npm run dev
 
 ### 🌕 Setup the client
 
-- **TODO**
+1. go to client directory
+
+```bash
+cd issho-client
+```
+
+2. install all the dependencies
+
+```bash
+npm install
+```
+
+3. run the project
+
+```bash
+npm run dev
+```
 
 ## 🧑‍💻 Authors/Contributors
 
