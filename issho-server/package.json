@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "start": "npm install && npm run dev",
     "dev": "ts-node-dev src/http_server.ts",
     "test": "ts-node-dev test/HttpClient.ts"
   },
