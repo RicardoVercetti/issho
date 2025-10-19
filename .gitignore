@@ -2,7 +2,7 @@
 dist/
 
 # Environment files (if you use them later)
-.env
+#.env
 
 # IDE / Editor folders
 .vscode/
